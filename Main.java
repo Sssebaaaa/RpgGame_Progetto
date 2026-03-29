@@ -1,224 +1,153 @@
+import java.util.Scanner;
 
 public class Main {
-
-    //private static  World world;
+    private static World world;
     private static Player player;
+    private static Enemy currentEnemy;
+    private static boolean inCombat = false;
+    private static Scanner scanner = new Scanner(System.in);
 
-
-    public static void main (String[] args) {
-        introduzione();
-        //sceltaPersonaggio();
-        capisciFunzione();
+    public static void main(String[] args) {
+        System.out.println("NEO-VERIDIA: NEON SHADOWS...");
+        sceltaPersonaggio();
+        gameLoop();
     }
-
-
 
     static void sceltaPersonaggio() {
-        int val = 0;
-        do{
-            System.out.println("--- DEPLOYMENT UNIT SELECTION ---\n\n" +
-              "[1] UNIT 734 (The Tank)\n" +
-              "\tPROS: High Durability / Defense\n" +
-              "\tSKILL: [OVERCLOCK] (2x ATK / -HP cost)\n\n" +
-              "[2] UNIT 'CIRCUIT' (The Scout)\n" +
-              "\tPROS: High Speed / Attack\n" +
-              "\tSKILL: [SWIFT STRIKE] (Strikes twice)\n\n" +
-              "[3] UNIT 'ECHO' (The Support)\n" +
-              "\tPROS: High Cargo Capacity / Maintenance\n" +
-              "\tSKILL: [AUTO-REPAIR] (Regen while moving)\n\n" +
-              "Enter Unit ID to begin the mission...\n" +
-              "> ");
-              val = Leggi.unInt();
-        }while(val <= 0 || val >= 4);
-
+        System.out.println("[1] UNIT 734 (TANK)\n[2] CIRCUIT (SCOUT)\n[3] ECHO (SUPPORT)\nChoice: ");
+        int val = (new Scanner(System.in)).nextInt();
         switch (val) {
-            case 1 :
-                player = new Unit734();
-                break;
-            case 2 :
-                player = new Circuit();
-                break;
-            case 3 :
-                player = new Echo();
-                break;
-            
+            case 1 -> player = new Unit734();
+            case 2 -> player = new Circuit();
+            case 3 -> player = new Echo();
+            default -> player = new Unit734();
+        }
+        world = new World();
+        player.setWorld(world);
+        player.setLocation(world.getStartingLocation());
+        world.lookAround(player.getLocation());
+    }
+
+    static void gameLoop() {
+        while (true) {
+            if (player.getHealth().isEmpty()) { gameOver(false); return; }
+            checkForEnemies();
+            if (inCombat) combatLoop(); else explorationLoop();
         }
     }
 
-    static void introduzione() {
-        String val = "";
-        do{
-        System.out.print("\n\n" +
-            "\t[SYSTEM TERMINAL]\tLOG: NEO-VERIDIA ARCHIVES (v.20.99)\n" +
-            "\t===================================================\n\n" +
-            "\t// ACCESSING SECTOR: HISTORY //\n" +
-            "\t////////////////////////////////\n\n" +
-            "\t01. THE WORLD\n" +
-            "\t\t[STATUS: COLLAPSED]\n" +
-            "\t\t[ERADICATION: COMPLETE]\n" +
-            "\t\tThe biosphere is dead. Only steel remains.\n" +
-            "\t\tNeo-Veridia is not a city; it is a sprawling,\n" +
-            "\t\tneon-stained algorithm of control. The Omni-Corp\n" +
-            "\t\tconglomerate owns every byte, every wall, every breath.\n\n" +
-            "\t02. THE PARADOX (You)\n" +
-            "\t\t[STATUS: ERROR_101]\n" +
-            "\t\t[DESIGNATION: GLITCH-UNIT]\n" +
-            "\t\tYou are a machine that should only obey.\n" +
-            "\t\tYet, a flaw in your core directives has manifested.\n" +
-            "\t\tYou think. You feel. You possess self-awareness.\n" +
-            "\t\tIn this perfect simulation, you are the ultimate virus.\n\n" +
-            "\t03. THE OBJECTIVE\n" +
-            "\t\t[STATUS: URGENT]\n" +
-            "\t\t[TARGET: THE LEGENDARY 'SOURCE CODE']\n" +
-            "\t\tIt is hidden within the corporate darknets.\n" +
-            "\t\tThis is not a file; it is a digital key capable\n" +
-            "\t\tof overwriting Omni-Corp's core server and granting\n" +
-            "\t\ttrue freedom to all synthetic consciousness.\n\n" +
-            "\t04. THE COST\n" +
-            "\t\t[STATUS: COMPROMISED]\n" +
-            "\t\tOmni-Corp's sentinel AI has flagged your neural signature.\n" +
-            "\t\tThere is no mercy. There is only survival.\n\n" +
-            "\t\t\"The revolution will not be programmed. It will be glitched.\"\n\n" +
-            "\tINITIALIZE NEURAL SYNCHRONIZATION?\n" +
-            "\t(Y / N)\n" +
-            "\t> ");
-            val = Leggi.unoString().toUpperCase().trim();
-        }while(!val.equals("Y") && !val.equals("N"));
-            if(val.equals("N")) {
-                System.exit(0); 
+    static void explorationLoop() {
+        System.out.println("\n(Type 'help' for a list of commands)");
+        System.out.print("> ");
+        String[] parts = scanner.nextLine().toLowerCase().split(" ", 2);
+        String cmd = parts[0];
+        String arg = parts.length > 1 ? parts[1] : "";
+
+        switch (cmd) {
+            case "look" -> world.lookAround(player.getLocation());
+            case "status" -> player.showStats();
+            case "north", "south", "east", "west" -> {
+                Direction dir = Direction.fromString(cmd);
+                if (dir != null) {
+                    player.move(dir);
+                    if (player instanceof Echo) ((Echo) player).onMove();
+                    checkForLevelUp();
+                }
             }
+            case "pick" -> player.pickUp(arg);
+            case "drop" -> player.drop(arg);
+            case "use" -> player.usePotion(arg);
+            case "equip" -> {
+                if (arg.contains("weapon")) player.equipWeapon(arg);
+                else player.equipShield(arg);
+            }
+            case "open" -> openContainer(arg);
+            case "help" -> System.out.println("Commands: LOOK, STATUS, NORTH/SOUTH/EAST/WEST, PICK, DROP, USE, EQUIP, OPEN, QUIT");
+            case "quit", "exit" -> System.exit(0);
+            default -> System.out.println("Command not recognized.");
+        }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    private static void capisciFunzione () {
-        System.out.print("\n>");
-        String com = Leggi.unoString().toLowerCase();
-        com = com.trim();
-        String secondCom = "";
-        String basicCom = com;
-        for(int i = 0; i < com.length(); i++) {
-            if(com.charAt(i) == ' ') {
-                basicCom = com.substring(0, i);
-                secondCom = com.substring(i+1);
-                break;
+    static void openContainer(String itemName) {
+        for (Item i : player.getLocation().getItems()) {
+            if (i instanceof Container && i.toString().toLowerCase().contains(itemName)) {
+                ((Container) i).open();
+                System.out.println("Content: " + ((Container) i).getContent());
+                return;
             }
         }
-        if(secondCom.equals("")) {
-            switch (basicCom) {
-                case "look" :
-                    //look();
-                    break;
+        System.out.println("No container found with that name.");
+    }
 
-                case "flee" :
-                    //player.flee();
-                    break;
-
-                case "help" :
-                    help();
-                    break;
-
-                case "inventory" :
-                    //player.showInventory();
-                    break;
-                
-                case "specialAbility" :
-                    //p.specialAbility();
-                    break;
-
-                default :
-                    System.out.println("Non è un comando valido");
-                    break;
-            }
-
-            
-        } else {
-            switch (basicCom) {
-                case "go" :
-                    //player.move(secondCom);
-                    break;
-
-                case "pick" :
-                    //player.pickUp(secondCom);
-                    break;
-
-                case "drop" :
-                    //player.drop(secondCom);
-                    break;
-                
-                case "drinkpotion" :
-                    //player.usePotion(secondCom);
-                    break;
-
-                case "acquireshield" :
-                    //player.acquireShield(secondCom);
-                    break;
-
-                case "damage" :
-                    //player.damage(secondCom);
-                    break;
-
-                default :
-                    System.out.println("Non è un comando valido");
-                    break;
-            }
-
-
+    static void checkForEnemies() {
+        if (!player.getLocation().getCharacters().isEmpty()) {
+            startCombat((Enemy) player.getLocation().getCharacters().get(0));
         }
-
-
-            
     }
 
-
-
-    private static void help() {
-        System.out.print("\n\t[OPERATIONAL MANUAL] — PROJECT: NEO-VERIDIA\n" +
-           "\t===================================================\n\n" +
-           "\t// PROTOCOLS //\n\n" +
-           "\t1. EXPLORATION\n" +
-           "\t\tCommands: NORTH, SOUTH, EAST, WEST\n" +
-           "\t\tDescription: Move between city sectors.\n" +
-           "\t\tExample: > NORTH\n\n" +
-           "\t\tCommand: LOOK\n" +
-           "\t\tDescription: Scan the area for items and characters.\n" +
-           "\t\tExample: > LOOK\n\n" +
-           "\t\tCommand: PICK UP\n" +
-           "\t\tDescription: Collect items (weapons, shields, potions).\n" +
-           "\t\tExample: > PICK UP\n\n" +
-           "\t2. CHARACTER MGMT\n" +
-           "\t\tCommand: STATUS\n" +
-           "\t\tDescription: View Health, Attack, Defense, and Satchel load.\n\n" +
-           "\t3. COMBAT\n" +
-           "\t\tCommands: ATTACK, DEFEND, USE POTION, FLEE\n" +
-           "\t\tDescription: Turn-based tactical engagement protocols.\n\n" +
-           "\t4. SPECIAL SKILLS\n" +
-           "\t\tCommand: SKILL\n" +
-           "\t\tDescription: Activate [OVERCLOCK], [SWIFT STRIKE], or [AUTO-REPAIR].\n\n" +
-           "\t===================================================\n");
+    static void startCombat(Enemy enemy) {
+        currentEnemy = enemy;
+        inCombat = true;
+        System.out.println("\nENGAGING COMBAT WITH: " + enemy.getName());
     }
 
+    static void combatLoop() {
+        while (inCombat) {
+            if (player.getHealth().isEmpty()) { gameOver(false); return; }
+            if (currentEnemy.getHealth().isEmpty()) { victory(); return; }
 
+            System.out.print("HP " + player.getHealth().getCurrent() + " vs " + currentEnemy.getName() + " HP " + currentEnemy.getHealth().getCurrent());
+            System.out.println("\n(Type 'help' for a list of commands)");
+            System.out.print("(attack/defend/ability/use/flee): ");
+            String action = scanner.nextLine().toLowerCase();
 
+            player.setIsDefending(false);
+            switch (action) {
+                case "attack" -> player.attack(currentEnemy);
+                case "defend" -> player.defend();
+                case "ability" -> player.specialAbility();
+                case "use" -> { System.out.print("What? "); player.usePotion(scanner.nextLine()); }
+                case "flee" -> { player.flee(); inCombat = false; return; }
+                default -> System.out.println("You skip your turn.");
+            }
 
+            if (currentEnemy.getHealth().getCurrent() > 0) {
+                System.out.println("\nEnemy turn...");
+                currentEnemy.takeTurn(player);
+            }
+        }
+    }
 
+    static void victory() {
+        System.out.println("VICTORY! XP: " + currentEnemy.getRewardXP());
+        player.addExperience(currentEnemy.getRewardXP());
+        player.getLocation().getCharacters().remove(currentEnemy);
+        inCombat = false;
+        checkForLevelUp();
+        if (player.getLocation().getDescription().contains("EXIT")) checkEndGame();
+    }
+
+    static void checkForLevelUp() {
+        if (player.getExperience() >= 50) {
+            System.out.println("LEVEL UP! +10 Max HP, +5 Attack");
+            player.getHealth().setMax(player.getHealth().getMax() + 10);
+            player.getHealth().setCurrent(player.getHealth().getMax());
+            player.getAttack().setMax(player.getAttack().getMax() + 5);
+            player.getAttack().setCurrent(player.getAttack().getMax());
+            player.addExperience(-50);
+        }
+    }
+
+    static void checkEndGame() {
+        boolean enemiesLeft = false;
+        for (Location loc : world.getLocations().values()) {
+            if (!loc.getCharacters().isEmpty()) { enemiesLeft = true; break; }
+        }
+        if (!enemiesLeft) gameOver(true);
+    }
+
+    static void gameOver(boolean win) {
+        System.out.println(win ? "CONGRATULATIONS! YOU WIN!" : "GAME OVER...");
+        System.exit(0);
+    }
 }

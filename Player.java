@@ -1,18 +1,81 @@
 public class Player extends Character {
-    
+    protected Location currentLocation;
+    protected World world;
+    protected int experience;
+
+    public Player(String name, int maxHealth, int attack, int defense, int inventoryCapacity) {
+        super(name, maxHealth, attack, defense, inventoryCapacity);
+        this.experience = 0;
+    }
+
+    public void setLocation(Location loc) { this.currentLocation = loc; }
+    public Location getLocation() { return currentLocation; }
+    public void setWorld(World w) { this.world = w; }
+    public int getExperience() { return experience; }
+    public void addExperience(int xp) { this.experience += xp; }
+
     public void move(Direction dir) {
-        // Logica di movimento
+        Location next = world.getExit(currentLocation, dir);
+        if (next != null) {
+            currentLocation = next;
+            System.out.println("You move " + dir.getDisplayName() + ".");
+            System.out.println(currentLocation.getDescription());
+        } else {
+            System.out.println("You can't go that way.");
+        }
     }
 
-    public void pickUp(Item item) {
-        // Logica per raccogliere un oggetto
+    public void pickUp(String itemName) {
+        Item item = null;
+        for (Item i : currentLocation.getItems()) {
+            if (i.toString().toLowerCase().contains(itemName.toLowerCase())) {
+                item = i; break;
+            }
+        }
+        if (item != null && !inventory.isFull()) {
+            inventory.addItem(item);
+            currentLocation.getItems().remove(item);
+            System.out.println("Picked up: " + item);
+        } else {
+            System.out.println("You can't pick that up.");
+        }
     }
 
-    public void drop(Item item) {
-        // Logica per scartare un oggetto
+    public void drop(String itemName) {
+        Item item = inventory.removeItem(itemName);
+        if (item != null) {
+            currentLocation.getItems().add(item);
+            if (item == equippedWeapon) equippedWeapon = null;
+            if (item == equippedShield) equippedShield = null;
+            System.out.println("Dropped: " + item);
+        }
     }
 
-    public void specialAbility() {
-        // Logica per l'abilità speciale base
+    public void equipWeapon(String itemName) {
+        Item i = inventory.getItem(itemName);
+        if (i instanceof Weapon) {
+            equippedWeapon = (Weapon) i;
+            System.out.println("Equipped weapon: " + i);
+        }
     }
+
+    public void equipShield(String itemName) {
+        Item i = inventory.getItem(itemName);
+        if (i instanceof Shield) {
+            equippedShield = (Shield) i;
+            System.out.println("Equipped shield: " + i);
+        }
+    }
+
+    public void usePotion(String itemName) {
+        Item i = inventory.getItem(itemName);
+        if (i instanceof Potion) {
+            Potion p = (Potion) i;
+            health.add(p.getPotency());
+            inventory.removeItem(itemName);
+            System.out.println("HP restored! You now have " + health.getCurrent() + " HP.");
+        }
+    }
+
+    public void specialAbility() { System.out.println("No special ability."); }
 }
