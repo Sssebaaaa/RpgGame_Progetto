@@ -102,17 +102,32 @@ public class Main {
             String action = scanner.nextLine().toLowerCase();
 
             player.setIsDefending(false);
+            boolean fled = false;
             switch (action) {
                 case "attack" -> player.attack(currentEnemy);
                 case "defend" -> player.defend();
                 case "ability" -> player.specialAbility();
                 case "use" -> { System.out.print("What? "); player.usePotion(scanner.nextLine()); }
-                case "flee" -> { player.flee(); inCombat = false; return; }
+                case "flee" -> fled = player.flee();
                 default -> System.out.println("You skip your turn.");
+            }
+
+            if (fled) {
+                // Muovi il giocatore in una stanza adiacente per evitare combattimento immediato
+                Location current = player.getLocation();
+                if (!current.getExits().isEmpty()) {
+                    Location dest = current.getExits().values().iterator().next();
+                    player.setLocation(dest);
+                    System.out.println("You escape to another location.");
+                    System.out.println(dest.getDescription());
+                }
+                inCombat = false;
+                return;
             }
 
             if (currentEnemy.getHealth().getCurrent() > 0) {
                 System.out.println("\nEnemy turn...");
+                currentEnemy.setIsDefending(false);
                 currentEnemy.takeTurn(player);
             }
         }

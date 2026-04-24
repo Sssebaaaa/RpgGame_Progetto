@@ -69,12 +69,39 @@ public class Player extends Character {
 
     public void usePotion(String itemName) {
         Item i = inventory.getItem(itemName);
-        if (i instanceof Potion) {
-            Potion p = (Potion) i;
-            health.add(p.getPotency());
-            inventory.removeItem(itemName);
-            System.out.println("HP restored! You now have " + health.getCurrent() + " HP.");
+        if (!(i instanceof Potion)) {
+            System.out.println("No such potion.");
+            return;
         }
+        Potion p = (Potion) i;
+        String type = p.getEffectType().toLowerCase();
+        switch (type) {
+            case "health", "cure" -> {
+                health.add(p.getPotency());
+                System.out.println("HP restored! HP: " + health.getCurrent() + "/" + health.getMax());
+            }
+            case "poison" -> {
+                health.setMax(Math.max(1, health.getMax() - p.getPotency()));
+                health.subtract(p.getPotency());
+                System.out.println("Poison! HP: " + health.getCurrent() + "/" + health.getMax());
+            }
+            case "power" -> {
+                if (equippedWeapon != null) {
+                    equippedWeapon.setDamage((int)(equippedWeapon.getDamage() * 1.3));
+                    equippedWeapon.setDurability(100);
+                    System.out.println("Weapon boosted! " + equippedWeapon);
+                } else if (equippedShield != null) {
+                    equippedShield.setDefense((int)(equippedShield.getDefense() * 1.3));
+                    equippedShield.setDurability(100);
+                    System.out.println("Shield boosted! " + equippedShield);
+                } else {
+                    System.out.println("Nothing equipped to boost.");
+                    return;
+                }
+            }
+            default -> { System.out.println("Unknown potion type."); return; }
+        }
+        inventory.removeItem(itemName);
     }
 
     public void specialAbility() { System.out.println("No special ability."); }

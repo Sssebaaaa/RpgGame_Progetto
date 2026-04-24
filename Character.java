@@ -55,9 +55,14 @@ public abstract class Character extends Entity {
         System.out.println(name + " is defending!");
     }
 
-    public void flee() {
-        if (new Random().nextInt(100) < 50) System.out.println("Flee successful!");
-        else { System.out.println("Flee failed!"); health.subtract(10); }
+    public boolean flee() {
+        if (new Random().nextInt(100) < 50) {
+            System.out.println("Flee successful!");
+            return true;
+        }
+        System.out.println("Flee failed!");
+        health.subtract(10);
+        return false;
     }
 
     public void showStats() {
