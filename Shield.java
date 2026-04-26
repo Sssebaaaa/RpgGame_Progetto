@@ -1,25 +1,38 @@
-class Shield extends Item{
-    protected int defense;
-    protected int durability;
-    public Shield(int weight, boolean isTransportable, boolean isDestructible, int defense, int durability){
-        super(weight, isTransportable, isDestructible);
-        this.defense=defense;
-        this.durability=durability;
+public class Shield extends Item {
+    private int defense;
+    private int durability;
+    private final int maxDurability;
+
+    public Shield(String name, String description, int weight, int defense, int durability) {
+        super(name, description, weight, true, true);
+        this.defense = Math.max(0, defense);
+        this.durability = Math.max(1, durability);
+        this.maxDurability = this.durability;
     }
-    public int getDefense(){
-        return this.defense;
+
+    public int getDefense() {
+        return defense;
     }
-    public int getDurability(){
-        return this.durability;
+
+    public int getDurability() {
+        return durability;
     }
-    public void setDefense(int defense){
-        this.defense=defense;
+
+    public void useOnce() {
+        durability = Math.max(0, durability - 1);
     }
-    public void setDurability(int durability){
-        this.durability=durability;
+
+    public boolean isBroken() {
+        return durability <= 0;
     }
+
+    public void boostPower() {
+        defense = Math.max(1, (int) Math.ceil(defense * 1.3));
+        durability = maxDurability;
+    }
+
     @Override
-    public String toString(){
-        return "Shield: [Defense: "+this.defense+", durability: "+this.durability+"]";
+    public String getShortDescription() {
+        return getName() + " - defense " + defense + ", durability " + durability;
     }
 }

@@ -1,32 +1,44 @@
-abstract class Item{
-    protected int weight;
-    protected boolean isTransportable;
-    protected boolean isDestructible;
-    public Item(int weight, boolean isTransportable, boolean isDestructible){
-        this.weight=weight;
-        this.isTransportable=isTransportable;
-        this.isDestructible=isDestructible;
+public class Item extends Entity {
+    private final int weight;
+    private final boolean transportable;
+    private final boolean destructible;
+    private final boolean keyItem;
+    private final String keyCode;
+
+    public Item(String name, String description, int weight, boolean transportable, boolean destructible) {
+        this(name, description, weight, transportable, destructible, false, "");
     }
-    public int getWeight(){
-        return this.weight;
+
+    public Item(String name, String description, int weight, boolean transportable, boolean destructible, boolean keyItem, String keyCode) {
+        super(name, description);
+        this.weight = Math.max(0, weight);
+        this.transportable = transportable;
+        this.destructible = destructible;
+        this.keyItem = keyItem;
+        this.keyCode = keyCode == null ? "" : keyCode.toLowerCase();
     }
-    public boolean getIsTransportable(){
-        return this.isTransportable;
+
+    public int getWeight() {
+        return weight;
     }
-    public boolean getIsDestructible(){
-        return this.isDestructible;
+
+    public boolean isTransportable() {
+        return transportable;
     }
-    public void setWeight(int weight){
-        this.weight=weight;
+
+    public boolean isDestructible() {
+        return destructible;
     }
-    public void setIsTransportable(boolean isTransportable){
-        this.isTransportable=isTransportable;
+
+    public boolean isKeyItem() {
+        return keyItem;
     }
-    public void setIsDestructible(boolean isDestructible){
-        this.isDestructible=isDestructible;
+
+    public String getKeyCode() {
+        return keyCode;
     }
-    @Override
-    public String toString(){
-        return "Item: [Weight: "+this.weight+", is transportable: "+this.isTransportable+", is destructible: "+this.isDestructible+"]";
+
+    public String getShortDescription() {
+        return getName() + " - " + getDescription();
     }
 }

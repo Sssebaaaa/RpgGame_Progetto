@@ -1,0 +1,185 @@
+
+5
+
+Zoom automatico
+Adventure game RPG-like _,.-------.,_ 
+,;~'             '~;, 
+,;                     ;, 
+;                         ; 
+,'                         ', 
+,;                           ;, 
+; ;      .           .      ; ; 
+| ;   ______       ______   ; | 
+|  `/~"     ~" . "~     "~\'  | 
+|  ~  ,-~~~^~, | ,~^~~~-,  ~  | 
+|   |        }:{        |   | 
+|   l       / | \       !   | 
+.~  (__,.--" .^. "--.,__)  ~. 
+|     ---;' / | \ `;---     | 
+\__.       \/^\/       .__/ 
+V| \                 / |V 
+| |T~\___!___!___/~T| | 
+| |`IIII_I_I_I_IIII'| | 
+|  \,III I I I III,/  | 
+\   `~~~~~~~~~~'    / 
+\   .       .   / 
+\.    ^    ./ 
+^~~~^~~~^ 
+ 
+1.1. Indicazioni generali 
+Dovete  sviluppare  un  gioco  di  ruolo  testuale;  di  seguito  sono  riportate  alcune  indicazioni,  ma  avete  piena  libertà 
+rispetto a cosa includere nel gioco e, soprattutto, all’ambientazione. 
+Storia 
+Il gioco deve presentare una storia significativa e accattivante ideata da voi. La storia, i testi e i comandi devono essere 
+tutti scritti in inglese. 
+Location 
+Il gioco è ambientato in un mondo di vostra invenzione. Il mondo è composto da luoghi (palazzo composto da stanze, 
+città composta da aree, etc.). I luoghi sono collegati tra loro in una struttura a grafo; da un luogo ad un altro ci si sposta 
+ortogonalmente (nord, sud, ovest, est). Non è detto che tutte le strade debbano sempre essere attive: da un luogo, 
+per esempio, ci si potrà spostare solo verso nord. La posizione all’interno di un luogo (al centro, vicino ad un muro, 
+etc.)  non  è  significativa,  conta  solo  il  luogo  in  cui  ci  si  trova.  Un  luogo  può  contenere  personaggi  ed  oggetti  ed  è 
+caratterizzato da una descrizione. 
+Personaggi 
+I  personaggi  sono  gli  esseri  che  popolano  il  mondo;  il  protagonista  del  gioco,  in  particolare,  è  un  personaggio.  I 
+personaggi  sono  caratterizzati  da  un  nome,  da  un’eventuale  descrizione  e  da  quattro  parametri  che  ne 
+contraddistinguono lo stato. Ognuno dei parametri, in particolare, è caratterizzato da due valori: il valore reale e quello 
+massimo: per esempio ha un valore reale di 38 di vita su un valore massimo di 50 [38/50]. 
+• vita: indica la vita del personaggio, quando è a 0, il personaggio muore e scompare dal gioco. Se il personaggio 
+che muore è il protagonista, il gioco termina; 
+• forza: indica la forza del personaggio, maggiore è la forza maggiore è il numero di oggetti che un personaggio 
+può portare e più potente è l’arma che può utilizzare; 
+• attacco: maggiore è il valore di attacco più pericoloso è il personaggio in combattimento; 
+• difesa: maggiore è il valore di difesa, minore è il danno subito dal personaggio in combattimento; 
+• esperienza:  cresce  ad  ogni  combattimento,  quando  raggiunge  50,  si  aumentano  del  20%  tutti  i  parametri 
+massimi del personaggio e si ripristinano quelli attuali. 
+Ogni personaggio ha una sacca in cui può portare degli oggetti trasportabili. La sacca ha un valore massimo che limita 
+il  peso  trasportabile  e  quindi  il  numero  degli  oggetti.  Gli  oggetti  possono  essere  aggiunti  alla  sacca  se  non  fanno 
+superare  il  peso  massimo  e  possono  essere  rimossi  e  lasciati  nel  luogo  in  cui  si  trova  il  personaggio.  Quando  un 
+personaggio muore tutti i suoi oggetti finiscono nel luogo in cui il personaggio è morto. 
+Oggetti 
+Gli oggetti si trovano nei luoghi visitabili dal protagonista e possono essere raccolti dai personaggi entro i limiti della 
+loro sacca. Ogni oggetto è caratterizzato da un nome ed eventualmente una descrizione. Gli oggetti sono di vari tipi: 
+• arma: è utilizzata nei combattimenti, ha un valore di danno e un indicatore di usura. L’usura diminuisce ad 
+ogni utilizzo, quando diventa 0 l’oggetto scompare dal gioco; 
+• scudo: è utilizzato nei combattimenti, ha un valore di difesa e un indicatore di usura; 
+• pozione 
+o cura:  aiuta  a  ripristinare  la  vita  di  un  personaggio,  ha  un  valore  di  cura  che  indica  il  quantitativo  di 
+salute che può curare; 
+o veleno: abbassa la vita di un personaggio (valore attuale e massimo); 
+o potenza: permette di aumentare del 30% l’attacco di un’arma, la difesa di uno scudo e ne ripristina 
+l’integrità.  
+• generici: sono oggetti presenti nei vari luoghi e servono per dare ambientazione e permettono l’interazione 
+con il protagonista mediante azioni: scrigni, armadi, etc.  
+I differenti tipi di oggetti sono caratterizzati da varie azioni. In particolare ci sono oggetti che sono: 
+• trasportabili: possono essere presi dai personaggi e messi nella sacca; 
+• apribili e chiudibili: come uno scrigno, un armadio, etc. Possono contenere altri oggetti; 
+• apribili e chiudibili con chiave: come uno scrigno, un armadio, etc. Possono contenere altri oggetti; 
+• distruttibili: possono essere distrutti con un’arma e quindi spariscono dal gioco con tutto il loro contenuto; 
+Ovviamente non tutti gli oggetti rendono disponibili tutte le azioni: una spada sarà trasportabile, ma non apribile; un 
+armadio può essere aperto, chiuso e distrutto, ma non trasportato, etc. 
+Combattimenti 
+Quando il protagonista si trova nello stesso luogo con un altro personaggio può combatterlo. Il combattimento avviene 
+a turni. Con un valore casuale si decide chi attacca per primo. Ad ogni turno il protagonista può attaccare, difendersi, 
+usare una pozione, scappare; analogamente per gli altri personaggi che saranno gestiti dal computer (non pensate a 
+cose strane, usate un approccio semplice).  
+Un combattimento avviene in questo modo:  
+• se  un personaggio attacca, infliggerà un danno  che dipenderà dal proprio attacco, dalla propria arma, dalla 
+difesa dell’avversario, etc. (elaborate voi una logica valida); 
+• stesso approccio per la difesa; 
+Il  combattimento  termina  quando  uno  dei  due  combattenti  scappa  o  muore.  Alla  morte  di  un  combattente  i  suoi 
+oggetti cadono nel luogo; l’altro combattente inoltre aumenta la propria esperienza di tanta quanta era l’esperienza 
+dell’avversario. 
+ 
+Comandi 
+L’interazione tra il protagonista e il mondo avviene mediante appositi comandi. Ne riporto qualcuno ad esempio: 
+• guarda: guardare cosa c’è nel luogo in cui ci si trova; 
+• combatti: per combattere; 
+• scappa: per fuggire da un combattimento; 
+• nord, sud, est, ovest: per cambiare luogo 
+• ... 
+Ci sono comandi generali sempre attivi (guarda, etc.) e ci sono comandi che sono dipendenti dal luogo (nord per 
+esempio è attivo solo se c’è un’uscita aperta verso nord), dagli oggetti (prendi è attivo solo se c’è qualcosa da 
+prendere), dai personaggi (parla, combatti, sono attivi se c’è qualche altro personaggio),etc. 
+Esempio 
+> IL CORRIDOIO DELLE TORTURE 
+Ti trovi nel corridoio delle torture, nella porta sud. Una lunga fila di finestre alla 
+tua sinistre conduce verso l’uscita nord, due porte a est conducono ad una stanza separata; 
+dai vetri scorgi lunghe file di banchi allineati e corpi riversi su di essi. 
+> Guarda 
+> Nella stanza vedi i seguenti oggetti: 
+    - Pozione curativa 
+ Nella stanza vedi i seguenti nemici: 
+   - Maestro degli abissi  
+     Vita[40/40] 
+     Forza [20/20] 
+     Attacco [13/13] 
+     Difesa [42/42] 
+     Esperienza [100] 
+> Nord 
+> ... 
+ 
+ 
+1.2. Note 
+Lo scopo del progetto è modellare ad oggetti e implementare un dimostratore di gioco. Non è richiesto il gioco intero 
+e soprattutto non è richiesta una delle attività più complesse legate al mondo dei giochi di ruolo, che è la calibrazione 
+dei vari parametri. 
+Sentitevi liberi di estendere il gioco come volete: aggiungere parametri di interesse nei personaggi, comandi, oggetti, 
+regole o tipologie di combattimento, etc. 
+Sentitevi liberi di estendere il software: interfaccia grafica, sistema multigiocatore, etc. 
+ 
+1.3. Gruppi 
+Il programma deve essere sviluppato in gruppi composti da 3 persone, di cui uno sarà il project manager. 
+Il project manager avrà un ruolo di integrazione e organizzativo: coordina il gruppo, indica le linee direttive, gestisce 
+eventuali conflitti e valorizza le idee di tutti i partecipanti del gruppo, formalizza le tempistiche per le consegne delle 
+varie parti del progetto e monitora lo stato di avanzamento, riceve le varie parti e si occupa di integrarle.  
+Mantiene (su un documento condiviso tra i membri del gruppo e il docente) un  diario di avanzamento delle attività 
+aggiornato ad ogni evento significativo. Nel diario sono indicati gli stati di avanzamento di ciascuna parte del sistema, 
+i problemi riscontrati e come sono stati affrontati e risolti, vengono indicati eventuali ritardi e riportate le motivazioni 
+e le contromisure.   
+Il project manager coordina l’integrazione delle varie componenti e i test sul sistema per verificare che tutto funzioni 
+correttamente, non ci siano crash e tutto proceda come da richieste.  
+In ciascun gruppo, tutti devono lavorare: non si accettano situazioni in cui qualcuno programma e qualcuno fa solo 
+ricerche. 
+ 
+ 
+1.4. Svolgimento 
+1) Ciascun gruppo procede con la progettazione individuando le classi, le relazioni tra classi, esplicitando il tutto nel 
+documento  condiviso  a  parole  e  tramite  diagrammi  UML.  Nel  documento  di  progetto  viene  riportato  il  link  a 
+GitHub. Viene inoltre suddiviso il lavoro di sviluppo tra i membri del gruppo, riportando sul documento condiviso 
+le  responsabilità  specifiche  dei  membri  del  gruppo.  Il  progetto  viene  discusso  con  il  docente,  il  quale  può 
+eventualmente modificare la suddivisione del lavoro se non equamente distribuita (carico di lavoro diverso porterà 
+a voto diverso); 
+2) Il progetto deve essere discusso con il docente e validato. Solo allora il gruppo può procedere con lo sviluppo.  
+3) il  giorno  della  consegna  il  codice  sorgente  del  progetto  e  i  vari  documenti,  devono  essere  inviati  al  docente  o 
+condivisi tramite Google Drive; 
+4) il  lavoro  svolto  dovrà  essere  presentato  alla  classe,  illustrando  il  progetto,  le  parti  significative  del  codice,  i 
+problemi  riscontrati  e  le  soluzioni.  Durante  la  discussione  presenterete  il  vostro  progetto  e  ogni  membro  del 
+gruppo descriverà la parte di propria competenza.  
+ 
+1.5. Valutazione  
+Per la valutazione si tengono in considerazione vari parametri:  
+• Prerequisiti 
+o Puntualità: maggiore è il ritardo, minore è il voto. 
+o Compilazione: progetto che non compila prende 3. 
+• Indicatori 
+o Documento di progetto 
+o Presentazione 
+o Bug o crash 
+o Qualità del codice 
+o Accorgimenti del software, idee, estensioni 
+o Lavoro in gruppo 
+Git  è  Legge:  "Se  non  è  su  GitHub/GitLab,  non  esiste".  Sarà  usato  per  vedere  chi  ha  fatto  i  commit,  quante  righe  di 
+codice, e quando. 
+ 
+ 
+ 
+ 
+ 
+1.6. Tempistiche 
+Assegnazione del lavoro: venerdì 6 febbraio 
+Consegna del documento di progetto: venerdì 7 marzo (UML con classi, metodi; divisione dei ruoli, etc.) Il documento 
+deve essere già stato precedentemente discusso con il docente e da lui validato! Cercate di anticipare la consegna per 
+avere più tempo per lavorare sul software. 
+Consegna finale: 23:59 del 13 aprile.  
+Presentazione dei lavori: successivamente. 
+ 

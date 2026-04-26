@@ -1,76 +1,211 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public abstract class Character extends Entity {
-    protected Stat health, attack, defense;
-    protected Weapon equippedWeapon;
-    protected Shield equippedShield;
-    protected boolean isDefending;
-    protected Inventory inventory;
-    protected String name;
+    private final Stat health;
+    private final Stat strength;
+    private final Stat attack;
+    private final Stat defense;
+    private final Stat experience;
+    private final Inventory inventory;
+    private Weapon equippedWeapon;
+    private Shield equippedShield;
+    private Location location;
+    private boolean defending;
+    private final Random random;
 
-    public Character(String name, int maxHealth, int attack, int defense, int inventoryCapacity) {
-        super(name, "");
-        this.name = name;
-        this.health = new Stat(maxHealth, maxHealth);
+    public Character(String name, String description, int health, int strength, int attack, int defense, int experience) {
+        super(name, description);
+        this.health = new Stat(health, health);
+        this.strength = new Stat(strength, strength);
         this.attack = new Stat(attack, attack);
         this.defense = new Stat(defense, defense);
-        this.inventory = new Inventory(inventoryCapacity);
+        this.experience = new Stat(experience, 50);
+        this.inventory = new Inventory();
+        this.random = new Random();
     }
 
-    public Stat getHealth() { return health; }
-    public Stat getAttack() { return attack; }
-    public Stat getDefense() { return defense; }
-    public String getName() { return name; }
-    public void setIsDefending(boolean def) { this.isDefending = def; }
+    public Stat getHealth() {
+        return health;
+    }
 
-    public void attack(Character target) {
-        int damage = attack.getCurrent() + new Random().nextInt(5);
-        if (equippedWeapon != null) {
-            damage += equippedWeapon.getDamage();
-            equippedWeapon.setDurability(equippedWeapon.getDurability() - 1);
-            if (equippedWeapon.getDurability() <= 0) {
-                System.out.println(name + "'s weapon broke!");
-                equippedWeapon = null;
-            }
+    public Stat getStrength() {
+        return strength;
+    }
+
+    public Stat getAttack() {
+        return attack;
+    }
+
+    public Stat getDefense() {
+        return defense;
+    }
+
+    public Stat getExperience() {
+        return experience;
+    }
+
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    public Weapon getEquippedWeapon() {
+        return equippedWeapon;
+    }
+
+    public Shield getEquippedShield() {
+        return equippedShield;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setDefending(boolean defending) {
+        this.defending = defending;
+    }
+
+    public boolean isDefending() {
+        return defending;
+    }
+
+    public int getCarryCapacity() {
+        return strength.getMax();
+    }
+
+    public boolean addItem(Item item) {
+        if (!item.isTransportable()) {
+            return false;
         }
+        return inventory.addItem(item, getCarryCapacity());
+    }
 
-        int targetDef = target.defense.getCurrent();
-        if (target.isDefending) targetDef *= 2;
-        if (target.equippedShield != null) {
-            targetDef += target.equippedShield.getDefense();
-            target.equippedShield.setDurability(target.equippedShield.getDurability() - 1);
-            if (target.equippedShield.getDurability() <= 0) {
-                System.out.println(target.name + "'s shield shattered!");
-                target.equippedShield = null;
-            }
+    public Item removeItem(String itemName) {
+        Item item = inventory.removeItem(itemName);
+        if (item != null && item == equippedWeapon) {
+            equippedWeapon = null;
         }
-
-        int finalDamage = Math.max(damage - targetDef, 0);
-        target.health.subtract(finalDamage);
-        System.out.println(name + " deals " + finalDamage + " damage to " + target.getName() + "!");
+        if (item != null && item == equippedShield) {
+            equippedShield = null;
+        }
+        return item;
     }
 
-    public void defend() {
-        isDefending = true;
-        System.out.println(name + " is defending!");
+    public Item findItem(String itemName) {
+        return inventory.findItem(itemName);
     }
 
-    public boolean flee() {
-        if (new Random().nextInt(100) < 50) {
-            System.out.println("Flee successful!");
+    public boolean equip(String itemName) {
+        Item item = findItem(itemName);
+        if (item instanceof Weapon weapon) {
+            if (strength.getCurrent() < weapon.getRequiredStrength()) {
+                return false;
+            }
+            equippedWeapon = weapon;
             return true;
         }
-        System.out.println("Flee failed!");
-        health.subtract(10);
+        if (item instanceof Shield shield) {
+            equippedShield = shield;
+            return true;
+        }
         return false;
     }
 
-    public void showStats() {
-        System.out.println("\n--- " + name + " ---");
-        System.out.println("HP: " + health.getCurrent() + "/" + health.getMax());
-        System.out.println("ATK/DEF: " + attack.getCurrent() + "/" + defense.getCurrent());
-        if (equippedWeapon != null) System.out.println("Weapon: " + equippedWeapon);
-        if (equippedShield != null) System.out.println("Shield: " + equippedShield);
-        System.out.println("Inventory: " + inventory.size());
+    public int attackTarget(Character target) {
+        int weaponDamage = equippedWeapon == null ? 0 : equippedWeapon.getDamage();
+        int baseDamage = attack.getCurrent() + weaponDamage + random.nextInt(4);
+        int targetDefense = target.defense.getCurrent();
+        if (target.defending) {
+            targetDefense += Math.max(1, target.defense.getCurrent() / 2);
+        }
+        if (target.equippedShield != null) {
+            targetDefense += target.equippedShield.getDefense();
+            target.equippedShield.useOnce();
+            if (target.equippedShield.isBroken()) {
+                target.removeBrokenShield();
+            }
+        }
+        if (equippedWeapon != null) {
+            equippedWeapon.useOnce();
+            if (equippedWeapon.isBroken()) {
+                removeBrokenWeapon();
+            }
+        }
+        int finalDamage = Math.max(1, baseDamage - targetDefense);
+        target.health.subtract(finalDamage);
+        return finalDamage;
+    }
+
+    private void removeBrokenWeapon() {
+        if (equippedWeapon != null) {
+            inventory.getItems().remove(equippedWeapon);
+            equippedWeapon = null;
+        }
+    }
+
+    private void removeBrokenShield() {
+        if (equippedShield != null) {
+            inventory.getItems().remove(equippedShield);
+            equippedShield = null;
+        }
+    }
+
+    public void useEquippedWeaponOutsideCombat() {
+        if (equippedWeapon == null) {
+            return;
+        }
+        equippedWeapon.useOnce();
+        if (equippedWeapon.isBroken()) {
+            removeBrokenWeapon();
+        }
+    }
+
+    public void addExperience(int amount) {
+        if (amount <= 0) {
+            return;
+        }
+        experience.add(amount);
+        while (experience.getCurrent() >= experience.getMax()) {
+            experience.subtract(experience.getMax());
+            levelUp();
+        }
+    }
+
+    private void levelUp() {
+        increaseStatByTwentyPercent(health);
+        increaseStatByTwentyPercent(strength);
+        increaseStatByTwentyPercent(attack);
+        increaseStatByTwentyPercent(defense);
+        health.restore();
+        strength.restore();
+        attack.restore();
+        defense.restore();
+    }
+
+    private void increaseStatByTwentyPercent(Stat stat) {
+        int newMax = Math.max(stat.getMax() + 1, (int) Math.ceil(stat.getMax() * 1.2));
+        stat.setMax(newMax);
+    }
+
+    public List<Item> dropAllItems() {
+        List<Item> dropped = new ArrayList<>(inventory.getItems());
+        inventory.getItems().clear();
+        equippedWeapon = null;
+        equippedShield = null;
+        return dropped;
+    }
+
+    public String statsBlock() {
+        return getName()
+                + System.lineSeparator() + "Health " + health
+                + System.lineSeparator() + "Strength " + strength
+                + System.lineSeparator() + "Attack " + attack
+                + System.lineSeparator() + "Defense " + defense
+                + System.lineSeparator() + "Experience " + experience;
     }
 }

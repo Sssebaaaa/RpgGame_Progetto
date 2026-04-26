@@ -1,41 +1,37 @@
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
-public class Location{
-    public String description;
-    public List <Item> items;
-    public List <Character> characters;
-    public HashMap <String, Location> exits;
-    public String getDescription() {
-        return description;
+import java.util.Map;
+
+public class Location extends Entity {
+    private final List<Item> items;
+    private final List<Character> characters;
+    private final Map<Direction, Location> exits;
+
+    public Location(String name, String description) {
+        super(name, description);
+        this.items = new ArrayList<>();
+        this.characters = new ArrayList<>();
+        this.exits = new EnumMap<>(Direction.class);
     }
-    public void setDescription(String description) {
-        this.description = description;
-    }
+
     public List<Item> getItems() {
         return items;
     }
-    public void setItems(List<Item> items) {
-        this.items = items;
-    }
+
     public List<Character> getCharacters() {
         return characters;
     }
-    public void setCharacters(List<Character> characters) {
-        this.characters = characters;
-    }
-    public HashMap<String, Location> getExits() {
+
+    public Map<Direction, Location> getExits() {
         return exits;
     }
-    public void setExits(HashMap<String, Location> exits) {
-        this.exits = exits;
-    }
-    public Location(String description, List<Item> items, List<Character> characters, HashMap<String, Location> exits) {
-        this.description = description;
-        this.items = items;
-        this.characters = characters;
-        this.exits = exits;
+
+    public void addExit(Direction direction, Location destination) {
+        exits.put(direction, destination);
     }
 
-    
+    public String describe() {
+        return getName() + System.lineSeparator() + getDescription();
+    }
 }

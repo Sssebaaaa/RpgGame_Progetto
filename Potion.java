@@ -1,25 +1,23 @@
-class Potion extends Item{
-    protected String effectType;
-    protected int potency;
-    public Potion(int weight, boolean isTransportable, boolean isDestructible, String effectType, int potency){
-        super(weight, isTransportable, isDestructible);
-        this.effectType=effectType;
-        this.potency=potency;
+public class Potion extends Item {
+    private final String effectType;
+    private final int potency;
+
+    public Potion(String name, String description, int weight, String effectType, int potency) {
+        super(name, description, weight, true, true);
+        this.effectType = effectType.toLowerCase();
+        this.potency = Math.max(1, potency);
     }
-    public String getEffectType(){
-        return this.effectType;
+
+    public String getEffectType() {
+        return effectType;
     }
-    public int getPotency(){
-        return this.potency;
+
+    public int getPotency() {
+        return potency;
     }
-    public void setEffectType(String effectType){
-        this.effectType=effectType;
-    }
-    public void setPotency(int potency){
-        this.potency=potency;
-    }
+
     @Override
-    public String toString(){
-        return "Potion: [Effect: "+this.effectType+", potency: "+this.potency+"]";
+    public String getShortDescription() {
+        return getName() + " - " + effectType + " potion (" + potency + ")";
     }
 }

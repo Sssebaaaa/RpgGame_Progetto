@@ -1,40 +1,72 @@
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
-class Container extends Item {
-    protected boolean isOpen;
-    protected boolean isLocked;
-    protected List<Item> content;
+public class Container extends Item {
+    private final List<Item> contents;
+    private boolean open;
+    private boolean locked;
+    private final String keyCode;
 
-    public Container(int weight, boolean isTransportable, boolean isDestructible) {
-        super(weight, isTransportable, isDestructible);
-        this.content = new ArrayList<>();
-        this.isOpen = false;
-        this.isLocked = false;
+    public Container(String name, String description, int weight, boolean destructible, boolean locked, String keyCode) {
+        super(name, description, weight, false, destructible);
+        this.contents = new ArrayList<>();
+        this.open = false;
+        this.locked = locked;
+        this.keyCode = keyCode == null ? "" : keyCode.toLowerCase();
     }
 
-    public List<Item> getContent() { return content; }
-    public void addItem(Item item) { content.add(item); }
-
-    public void open() {
-        if (isLocked) System.out.println("It's locked!");
-        else {
-            isOpen = true;
-            System.out.println("You opened the container.");
-        }
+    public List<Item> getContents() {
+        return contents;
     }
 
-    public void destroy() {
-        if (isDestructible) {
-            System.out.println("Container destroyed! Items have fallen to the ground.");
-            isOpen = true; // Simulates forced opening
-        } else {
-            System.out.println("You can't destroy this.");
+    public void addItem(Item item) {
+        contents.add(item);
+    }
+
+    public boolean isOpen() {
+        return open;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public boolean canUnlockWith(Item item) {
+        return item != null && item.isKeyItem() && item.getKeyCode().equals(keyCode);
+    }
+
+    public boolean unlock(Item item) {
+        if (!locked) {
+            return true;
         }
+        if (canUnlockWith(item)) {
+            locked = false;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean open() {
+        if (locked) {
+            return false;
+        }
+        open = true;
+        return true;
+    }
+
+    public void close() {
+        open = false;
+    }
+
+    public List<Item> emptyContents() {
+        List<Item> dropped = new ArrayList<>(contents);
+        contents.clear();
+        return dropped;
     }
 
     @Override
-    public String toString() {
-        return "Container (" + (isOpen ? "Open" : "Closed") + ", " + content.size() + " items)";
+    public String getShortDescription() {
+        String state = locked ? "locked" : open ? "open" : "closed";
+        return getName() + " - " + state;
     }
 }

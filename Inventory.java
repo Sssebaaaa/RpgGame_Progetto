@@ -2,90 +2,66 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Inventory {
-    private List<Item> items;
-    private int maxCapacity;
+    private final List<Item> items;
 
-    public Inventory(int maxCapacity) {
+    public Inventory() {
         this.items = new ArrayList<>();
-        this.maxCapacity = maxCapacity;
     }
 
     public List<Item> getItems() {
-        return new ArrayList<>(items);
+        return items;
     }
 
-    public boolean addItem(Item item) {
-        if (item == null) return false;
-        if (items.size() >= maxCapacity) {
+    public int getCurrentWeight() {
+        int total = 0;
+        for (Item item : items) {
+            total += item.getWeight();
+        }
+        return total;
+    }
+
+    public boolean canAdd(Item item, int maxWeight) {
+        return item != null && getCurrentWeight() + item.getWeight() <= maxWeight;
+    }
+
+    public boolean addItem(Item item, int maxWeight) {
+        if (!canAdd(item, maxWeight)) {
             return false;
         }
         items.add(item);
         return true;
     }
 
-    public Item removeItem(String itemName) {
-        for (int i = 0; i < items.size(); i++) {
-            if (items.get(i).toString().toLowerCase().contains(itemName.toLowerCase())) {
-                return items.remove(i);
+    public Item findItem(String name) {
+        for (Item item : items) {
+            if (item.getName().equalsIgnoreCase(name)) {
+                return item;
             }
         }
-        return null;
-    }
-
-    public Item removeItem(int index) {
-        if (index >= 0 && index < items.size()) {
-            return items.remove(index);
-        }
-        return null;
-    }
-
-    public boolean contains(String itemName) {
         for (Item item : items) {
-            if (item.toString().toLowerCase().contains(itemName.toLowerCase())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public Item getItem(String itemName) {
-        for (Item item : items) {
-            if (item.toString().toLowerCase().contains(itemName.toLowerCase())) {
+            if (item.getName().toLowerCase().contains(name.toLowerCase())) {
                 return item;
             }
         }
         return null;
     }
 
-    public Item getItem(int index) {
-        if (index >= 0 && index < items.size()) {
-            return items.get(index);
+    public Item removeItem(String name) {
+        Item item = findItem(name);
+        if (item != null) {
+            items.remove(item);
         }
-        return null;
+        return item;
     }
 
-    public int size() {
-        return items.size();
-    }
-
-    public int getAvailableSlots() {
-        return maxCapacity - items.size();
-    }
-
-    public boolean isFull() {
-        return items.size() >= maxCapacity;
-    }
-
-    public void showInventory() {
-        System.out.println("\n=== INVENTARIO ===");
+    public String describe() {
         if (items.isEmpty()) {
-            System.out.println("L'inventario e' vuoto.");
-        } else {
-            for (int i = 0; i < items.size(); i++) {
-                System.out.println("[" + i + "] " + items.get(i).toString());
-            }
+            return "Inventory is empty.";
         }
-        System.out.println("Spazio utilizzato: " + items.size() + "/" + maxCapacity);
-        System.out.println("==================\n");
+        StringBuilder builder = new StringBuilder();
+        for (Item item : items) {
+            builder.append("- ").append(item.getShortDescription()).append(System.lineSeparator());
+        }
+        return builder.toString().trim();
     }
 }
