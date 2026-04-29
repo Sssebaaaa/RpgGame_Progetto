@@ -1,0 +1,36 @@
+Diario di avanzamento – Progetto RPG Game
+3 marzo – Avvio del progetto
+Abbiamo creato il repository su GitHub e impostato i file di base: il README e il .gitignore. Subito dopo abbiamo aggiornato il README con il nome e l'idea del gioco ("Neo-Veridia: Neon Shadows"), così da avere chiaro fin da subito il tema su cui lavorare. In questa fase iniziale ci siamo confrontati su che tipo di gioco volessimo realizzare e abbiamo deciso di puntare su un RPG testuale ambientato in un mondo cyberpunk.
+
+12 marzo – Prime prove sul parser
+Primo file di codice vero: CommandParser.java. Qui abbiamo iniziato a capire come gestire i comandi che il giocatore scrive a schermo. È stato il momento "capisci come funziona", utile per familiarizzare con la logica di un gioco testuale e per metterci d'accordo su come l'utente avrebbe interagito col gioco (verbi, oggetti, direzioni).
+
+Tra il 12 e il 18 marzo – Pausa di riorganizzazione
+Dopo i primi tentativi ci siamo resi conto che stavamo procedendo un po' alla cieca, senza un'idea precisa della direzione. Abbiamo quindi deciso di fermarci e fare alcuni incontri di gruppo per ripartire con le idee più chiare. Durante questi incontri abbiamo:
+
+Ridiscusso la storia da zero: ambientazione, protagonista, antagonisti, missioni principali e finale. Da qui è nata l'idea definitiva di Neo-Veridia, una città piena di intelligenze artificiali ribelli, e dei personaggi che il giocatore avrebbe incontrato (Echo, Circuit, Unit734).
+Deciso chi fa cosa: ci siamo divisi i compiti in base alle preferenze e alle capacità di ognuno. Qualcuno si è occupato delle classi dei personaggi, qualcun altro del mondo e delle locazioni, altri ancora degli oggetti e dell'inventario, e una persona del Main e del flusso di gioco.
+Definito una struttura comune: abbiamo elencato su carta tutte le classi che ci sarebbero servite e come si sarebbero parlate tra loro, in modo da non lavorare scollegati e da evitare di rifare lo stesso lavoro due volte.
+Stabilito un metodo di lavoro su Git: ci siamo messi d'accordo su come fare i commit e i push per non sovrascriverci a vicenda.
+Questa pausa, anche se non ha prodotto codice, è stata fondamentale: senza di essa avremmo continuato a improvvisare.
+
+18 marzo – Costruzione dell'ossatura
+Forti di quanto deciso negli incontri, abbiamo lavorato tutti insieme alla struttura del progetto. In una sola giornata abbiamo creato le classi principali del gioco:
+
+Entity e Location per gli elementi base del mondo
+Character e Stat per i personaggi e le loro statistiche
+Player, Enemy, Echo, Circuit, Unit734 per i vari tipi di personaggi (con i nomi decisi nella fase di riorganizzazione della storia)
+Item, Potion, Shield, Weapon, Container per gli oggetti
+Abbiamo anche fatto il primo Main.java funzionante e sistemato un paio di merge con la versione online del repository, mettendo in pratica le regole su Git che ci eravamo dati.
+
+21 marzo – Main più solido e lettura file
+Abbiamo ampliato parecchio il Main.java (oltre 200 righe in più) e aggiunto Leggi.java per gestire la lettura dei dati da file. Il gioco inizia a prendere forma e si possono fare le prime prove vere.
+
+29 marzo – Versione "gioco completo"
+Tappa importante: una prima versione giocabile dall'inizio alla fine. Abbiamo aggiunto Direction.java e Inventory.java, riorganizzato il Main, aggiornato tante classi e caricato anche la documentazione del progetto in PDF. A questo punto il gioco rispecchia la storia che avevamo immaginato negli incontri di metà marzo.
+
+24 aprile – Correzioni e rifiniture
+Dopo qualche giorno di test, abbiamo dedicato una sessione a sistemare i bug trovati e a migliorare alcuni dettagli su Player, Character e Main. Aggiornato anche il .gitignore per non tenere file inutili nel repository.
+
+26 aprile – Ultima grande passata
+Refactoring e potenziamento finale: tutte le classi sono state riviste e migliorate, con un grosso intervento sul Main.java (oltre 700 righe modificate) per rendere il gioco più ricco, scorrevole e stabile. Aggiunto anche file.txt con i contenuti testuali di gioco (descrizioni delle stanze, dialoghi, oggetti).
